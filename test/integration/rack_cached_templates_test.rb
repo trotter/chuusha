@@ -1,12 +1,14 @@
 require 'test_helper'
 
 class RackCachedTemplates < Test::Unit::TestCase
-  PUBLIC_DIR = File.dirname(__FILE__) + '/../support/public'
+  SUPPORT_DIR = File.dirname(__FILE__) + '/../support'
+  PUBLIC_DIR  = SUPPORT_DIR + '/public'
+
   include Rack::Test::Methods
 
   def app
     app = Rack::Builder.new {
-      use Rack::CachedTemplates, PUBLIC_DIR
+      use Rack::CachedTemplates, SUPPORT_DIR + "/config.yml", PUBLIC_DIR
       run Proc.new { |env| [200, {}, "hi"] }
     }
   end
@@ -21,5 +23,12 @@ class RackCachedTemplates < Test::Unit::TestCase
     get "/application.js"
     assert last_response.ok?
     assert_equal File.read(PUBLIC_DIR + "/application.js.erb"), last_response.body
+  end
+
+  test "should pass variables to template" do
+    expected_resp = 
+    get "/application.css"
+    assert last_response.ok?
+    assert_equal "p { color: #000; }\n", last_response.body
   end
 end
