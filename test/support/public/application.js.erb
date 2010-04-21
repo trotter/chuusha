@@ -1,0 +1,1 @@
+var awesome = "Is awesome";
