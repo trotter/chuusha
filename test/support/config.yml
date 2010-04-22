@@ -1,1 +1,5 @@
-black: "#000"
+cache:
+  envs: ["production"]
+  on_load: true
+variables:
+  black: "#000"

@@ -8,9 +8,13 @@ class RackCachedTemplates < Test::Unit::TestCase
 
   def app
     app = Rack::Builder.new {
-      use Rack::CachedTemplates, SUPPORT_DIR + "/config.yml", PUBLIC_DIR
+      use Rack::CachedTemplates::Adapter, SUPPORT_DIR + "/config.yml", PUBLIC_DIR
       run Proc.new { |env| [200, {}, "hi"] }
     }
+  end
+
+  setup do
+    ENV['RACK_ENV'] = 'test'
   end
 
   test "should pass through when there is no template" do
@@ -26,9 +30,43 @@ class RackCachedTemplates < Test::Unit::TestCase
   end
 
   test "should pass variables to template" do
-    expected_resp = 
     get "/application.css"
     assert last_response.ok?
     assert_equal "p { color: #000; }\n", last_response.body
+  end
+
+  test "should cache the template as specified by config" do
+    cached_file = PUBLIC_DIR + "/application.css"
+    begin
+      get "/application.css"
+      assert !File.exist?(cached_file)
+
+      ENV['RACK_ENV'] = 'production'
+      get "/application.css"
+      assert File.exist?(cached_file)
+
+      assert_equal "p { color: #000; }\n", File.read(cached_file)
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      File.delete(cached_file) if File.exist?(cached_file)
+    end
+  end
+
+  test "should cache templates on boot if specified" do
+    cached_files = [ PUBLIC_DIR + "/application.css",
+                     PUBLIC_DIR + "/application.js" ]
+    begin
+      ENV['RACK_ENV'] = 'production'
+
+      get '/' # gotta hit it one to init things
+      cached_files.each do |file|
+        assert File.exist?(file)
+      end
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      cached_files.each do |file|
+        File.delete(file) if File.exist?(file)
+      end
+    end
   end
 end
