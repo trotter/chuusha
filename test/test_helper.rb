@@ -1,6 +1,6 @@
-require 'rack-cached-template'
-
 require 'rubygems'
+require 'rack-cached-templates'
+
 require 'test/unit'
 require 'rack/test'
 
