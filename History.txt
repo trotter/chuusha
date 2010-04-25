@@ -1,0 +1,4 @@
+== 0.1.0 / 2010-04-25
+  * First Release
+    * Render templates for static assets
+    * Supports config file for sharing constants
