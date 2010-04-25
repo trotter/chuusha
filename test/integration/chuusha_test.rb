@@ -8,7 +8,7 @@ class ChuushaTest < Test::Unit::TestCase
 
   def app
     app = Rack::Builder.new {
-      use Chuusha::Rack, SUPPORT_DIR + "/config.yml", PUBLIC_DIR
+      use Chuusha::Rack, PUBLIC_DIR, SUPPORT_DIR + "/config.yml"
       run Proc.new { |env| [200, {}, "hi"] }
     }
   end
@@ -68,5 +68,11 @@ class ChuushaTest < Test::Unit::TestCase
         File.delete(file) if File.exist?(file)
       end
     end
+  end
+
+  test "the config file should be optional" do
+    chuusha = Chuusha::Rack.new(nil, PUBLIC_DIR)
+    resp = chuusha.call({"PATH_INFO" => '/no_config.css'})
+    assert_equal "p { color: #00f; }\n", resp.last
   end
 end

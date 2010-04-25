@@ -3,7 +3,7 @@ require 'erubis'
 
 module Chuusha
   class Rack
-    def initialize(app, config, root_dir)
+    def initialize(app, root_dir, config=nil)
       @app      = app
       @root_dir = root_dir
       @config   = Config.new(config)
@@ -35,13 +35,13 @@ module Chuusha
     attr_reader :variables
 
     def initialize(file)
-      @config     = YAML.load_file(file)
+      @config     = file ? YAML.load_file(file) : {}
       @variables  = @config["variables"] || {}
       @cache      = @config["cache"] || {}
     end
 
     def cache_envs
-      @cache["envs"]
+      @cache["envs"] || []
     end
 
     def cache?
