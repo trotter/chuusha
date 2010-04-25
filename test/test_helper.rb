@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'rack-cached-templates'
+require 'chuusha'
 
 require 'test/unit'
 require 'rack/test'

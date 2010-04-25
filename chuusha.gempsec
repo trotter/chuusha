@@ -1,13 +1,13 @@
-PKG_VERSION = "0.0.1"
+PKG_VERSION = "0.1.0"
 PKG_FILES   = Dir['README.textile',
                   'lib/**/*.rb']
 
 $spec = Gem::Specification.new do |s|
-  s.name = 'rack-cached-templates'
+  s.name = 'chuusha'
   s.version = PKG_VERSION
   s.summary = "Run templates through erb and cache the resulting static file"
   s.description = <<EOS
-  Rack::CachedTemplates allows you to evaluate both javascript and css templates 
+  Chuusha allows you to evaluate both javascript and css templates 
   within the same context, meaning that you can share constants between the
   templates.
 EOS

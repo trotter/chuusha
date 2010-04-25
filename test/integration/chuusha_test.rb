@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RackCachedTemplates < Test::Unit::TestCase
+class ChuushaTest < Test::Unit::TestCase
   SUPPORT_DIR = File.dirname(__FILE__) + '/../support'
   PUBLIC_DIR  = SUPPORT_DIR + '/public'
 
@@ -8,7 +8,7 @@ class RackCachedTemplates < Test::Unit::TestCase
 
   def app
     app = Rack::Builder.new {
-      use Rack::CachedTemplates::Adapter, SUPPORT_DIR + "/config.yml", PUBLIC_DIR
+      use Chuusha::Rack, SUPPORT_DIR + "/config.yml", PUBLIC_DIR
       run Proc.new { |env| [200, {}, "hi"] }
     }
   end
