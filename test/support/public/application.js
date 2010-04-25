@@ -1,1 +1,0 @@
-var awesome = "Is awesome";
