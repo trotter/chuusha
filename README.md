@@ -15,6 +15,8 @@ Next, require the gem and tell your rack application to use chuusha. You will
 need to point it at the directory containing your public assets.
 
     # in ./config.ru
+    require 'chuusha'
+
     use Chuusha::Rack, File.dirname(__FILE__) + '/public'
     run Rack::URLMap.new("/" => YOUR_RAILS_APP::Application)
 

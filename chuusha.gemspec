@@ -13,6 +13,7 @@ $spec = Gem::Specification.new do |s|
 EOS
 
   s.add_dependency("rack", ">= 1.1.0")
+  s.add_dependency("erubis", ">= 2.6.5")
   s.files       = PKG_FILES.to_a
   s.has_rdoc    = false
   s.author      = "Trotter Cashion"
