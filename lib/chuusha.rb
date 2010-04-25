@@ -59,6 +59,7 @@ module Chuusha
       @config = config
       @outfile = path
       @path = @outfile + ".erb"
+      @evaluated = nil
     end
 
     def template_exists?
