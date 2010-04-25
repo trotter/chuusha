@@ -35,15 +35,26 @@ class ChuushaTest < Test::Unit::TestCase
     assert_equal "p { color: #000; }\n", last_response.body
   end
 
-  test "should cache the template as specified by config" do
+  test "should allow override of cached envs" do
     cached_file = PUBLIC_DIR + "/application.css"
+
+    # redefining app to overcome overriding of cached envs
+    app = Rack::Builder.new {
+      use Chuusha::Rack, PUBLIC_DIR, { "cache" => { "envs" => ["staging"],
+                                                    "on_load" => false },
+                                       "variables" => { "black" => "#000" }}
+      run Proc.new { |env| [200, {}, "hi"] }
+    }
+
+    session = Rack::Test::Session.new(Rack::MockSession.new(app))
+
     begin
-      get "/application.css"
+      session.get "/application.css"
       assert !File.exist?(cached_file)
 
-      ENV['RACK_ENV'] = 'production'
-      get "/application.css"
-      assert File.exist?(cached_file)
+      ENV['RACK_ENV'] = 'staging'
+      session.get "/application.css"
+      assert File.exist?(cached_file), "Expected a cache file"
 
       assert_equal "p { color: #000; }\n", File.read(cached_file)
     ensure
@@ -52,15 +63,50 @@ class ChuushaTest < Test::Unit::TestCase
     end
   end
 
-  test "should cache templates on boot if specified" do
+  test "should cache templates on load by default in production" do
     cached_files = [ PUBLIC_DIR + "/application.css",
                      PUBLIC_DIR + "/application.js" ]
+
+    # redefining app to overcome overriding of cached envs
+    app = Rack::Builder.new {
+      use Chuusha::Rack, PUBLIC_DIR, { "variables" => { "black" => "#000" }}
+      run Proc.new { |env| [200, {}, "hi"] }
+    }
+
+    session = Rack::Test::Session.new(Rack::MockSession.new(app))
+
     begin
       ENV['RACK_ENV'] = 'production'
 
-      get '/' # gotta hit it one to init things
+      session.request '/' # gotta hit it once to init things
       cached_files.each do |file|
         assert File.exist?(file)
+      end
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      cached_files.each do |file|
+        File.delete(file) if File.exist?(file)
+      end
+    end
+  end
+
+  test "should not cache templates on load if specified" do
+    cached_files = [ PUBLIC_DIR + "/application.css",
+                     PUBLIC_DIR + "/application.js" ]
+
+    app = Rack::Builder.new {
+      use Chuusha::Rack, PUBLIC_DIR, { "cache" => { "on_load" => false },
+                                       "variables" => { "black" => "#000" }}
+      run Proc.new { |env| [200, {}, "hi"] }
+    }
+    session = Rack::Test::Session.new(Rack::MockSession.new(app))
+
+    begin
+      ENV['RACK_ENV'] = 'production'
+
+      session.request '/' # gotta hit it one to init things
+      cached_files.each do |file|
+        assert !File.exist?(file)
       end
     ensure
       ENV['RACK_ENV'] = 'test'

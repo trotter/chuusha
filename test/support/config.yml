@@ -1,5 +1,4 @@
 cache:
-  envs: ["production"]
-  on_load: true
+  envs: ["staging"]
 variables:
   black: "#000"

@@ -34,14 +34,15 @@ module Chuusha
   class Config
     attr_reader :variables
 
-    def initialize(file)
-      @config     = file ? YAML.load_file(file) : {}
+    def initialize(config)
+      @config     = load_config(config)
       @variables  = @config["variables"] || {}
       @cache      = @config["cache"] || {}
+      default_cache_on_load_to_true
     end
 
     def cache_envs
-      @cache["envs"] || []
+      @cache["envs"] || ["production"]
     end
 
     def cache?
@@ -52,6 +53,26 @@ module Chuusha
     def cache_on_load?
       @cache["on_load"] && cache?
     end
+
+    private
+      def default_cache_on_load_to_true
+        @cache["on_load"] = if @cache["on_load"].nil?
+                              true
+                            else
+                              @cache["on_load"]
+                            end
+      end
+
+      def load_config(config)
+        case config
+        when String
+          YAML.load_file(config)
+        when Hash
+          config
+        else
+          {}
+        end
+      end
   end
 
   class Renderer
