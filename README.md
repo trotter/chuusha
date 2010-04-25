@@ -43,4 +43,4 @@ can tweet me at @cashion, as I often respond more quickly to public humiliation
 Acknowledgements
 ----------------
 
-Thanks to ["Mat Schaffer"](http://matschaffer.com) for the name.
+Thanks to [Mat Schaffer](http://matschaffer.com) for the name.
