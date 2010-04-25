@@ -1,4 +1,4 @@
-Chuusha is a Rack adapter that treats your css and javascript files as erb
+Chuusha (pronounced chew-sha) is a Rack adapter that treats your css and javascript files as erb
 templates. It also provides a basic facility for sharing constants between all
 your templates and the rest of your Rack stack. It will continually evaluate
 templates in dev mode, while caching the rendered template in production. It
@@ -39,3 +39,8 @@ Chuusha is still pretty young and probably has bugs. Feel free to email me
 (Trotter Cashion) at cashion@gmail.com if you find anything. Alternately, you
 can tweet me at @cashion, as I often respond more quickly to public humiliation
 :-).
+
+Acknowledgements
+----------------
+
+Thanks to ["Mat Schaffer"](http://matschaffer.com) for the name.
