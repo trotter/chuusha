@@ -46,8 +46,8 @@ module Chuusha
     end
 
     def cache?
-      env = ENV['RACK_ENV'] || ENV['RAILS_ENV']
-      cache_envs.include?(env)
+      # If we're in rails, always cache
+      ENV['RAILS_ENV'] || cache_envs.include?(ENV['RACK_ENV'])
     end
 
     def cache_on_load?

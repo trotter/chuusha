@@ -35,6 +35,37 @@ class ChuushaTest < Test::Unit::TestCase
     assert_equal "p { color: #000; }\n", last_response.body
   end
 
+  test "it should always cache templates on load if rails is around" do
+    cached_file = PUBLIC_DIR + "/application.css"
+
+    begin
+      ENV['RAILS_ENV'] = 'development'
+      get "/"
+      assert File.exist?(cached_file), "Expected a cache file"
+      assert_equal "p { color: #000; }\n", File.read(cached_file)
+    ensure
+      ENV['RAILS_ENV'] = nil
+      File.delete(cached_file) if File.exist?(cached_file)
+    end
+  end
+
+  test "it should always cache templates if rails is around" do
+    cached_file = PUBLIC_DIR + "/application.css"
+
+    begin
+      ENV['RAILS_ENV'] = 'development'
+      get "/"
+      mtime = File.mtime(cached_file)
+
+      sleep 1 # sleeping is the easiest way to get the mtime to change
+      get "/application.css"
+      assert_not_equal mtime, File.mtime(cached_file)
+    ensure
+      ENV['RAILS_ENV'] = nil
+      File.delete(cached_file) if File.exist?(cached_file)
+    end
+  end
+
   test "should allow override of cached envs" do
     cached_file = PUBLIC_DIR + "/application.css"
 
