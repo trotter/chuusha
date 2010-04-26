@@ -103,8 +103,7 @@ module Chuusha
     end
 
     def respond
-      # TODO: Stripping the filename is kinda rugged
-      [200, {"Content-Type" => ::Rack::Mime.mime_type(@outfile.gsub(/^.*\./, '.'))}, render]
+      [200, {"Content-Type" => ::Rack::Mime.mime_type(File.extname(@outfile))}, render]
     end
   end
 end
