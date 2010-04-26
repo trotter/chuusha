@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'chuusha'
 
+require 'rack'
 require 'test/unit'
 require 'rack/test'
 

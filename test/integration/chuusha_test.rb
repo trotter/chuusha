@@ -35,6 +35,14 @@ class ChuushaTest < Test::Unit::TestCase
     assert_equal "p { color: #000; }\n", last_response.body
   end
 
+  test "should return the correct mime-type" do
+    get "/application.js"
+    assert_equal Rack::Mime.mime_type(".js"), last_response.headers["Content-Type"]
+
+    get "/application.css"
+    assert_equal Rack::Mime.mime_type(".css"), last_response.headers["Content-Type"]
+  end
+
   test "it should always cache templates on load if rails is around" do
     cached_file = PUBLIC_DIR + "/application.css"
 

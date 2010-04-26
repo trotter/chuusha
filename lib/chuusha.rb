@@ -103,8 +103,8 @@ module Chuusha
     end
 
     def respond
-      # TODO: Should get right content-type
-      [200, {"Content-Type" => "text/html"}, render]
+      # TODO: Stripping the filename is kinda rugged
+      [200, {"Content-Type" => ::Rack::Mime.mime_type(@outfile.gsub(/^.*\./, '.'))}, render]
     end
   end
 end
