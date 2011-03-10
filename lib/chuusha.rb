@@ -3,15 +3,16 @@ require 'erubis'
 
 module Chuusha
   class Rack
-    def initialize(app, root_dir, config=nil)
+    def initialize(app, root_dir, config=nil, output_dir = nil)
       @app      = app
       @root_dir = root_dir
       @config   = Config.new(config)
+      @output_dir = output_dir
       cache_everything if @config.cache_on_load?
     end
 
     def call(env)
-      renderer = Renderer.new(@config, @root_dir + env["PATH_INFO"])
+      renderer = Renderer.new(@config, @root_dir + env["PATH_INFO"], @output_dir)
       return renderer.respond if renderer.template_exists?
       @app.call(env)
     end
@@ -19,7 +20,7 @@ module Chuusha
     private
       def cache_everything
         template_files.each do |file|
-          renderer = Renderer.new(@config, file)
+          renderer = Renderer.new(@config, file, @output_dir)
           renderer.write_cached_copy
         end
       end
@@ -76,10 +77,13 @@ module Chuusha
   end
 
   class Renderer
-    def initialize(config, path)
+    def initialize(config, path, output_dir)
       @config = config
       @outfile = path
-      @path = @outfile + ".erb"
+      if (output_dir != nil)
+        @outfile = File.join(output_dir,File.basename(path))
+      end
+      @path = path + ".erb"
       @evaluated = nil
     end
 

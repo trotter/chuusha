@@ -46,3 +46,11 @@ Acknowledgements
 ----------------
 
 Thanks to [Mat Schaffer](http://matschaffer.com) for the name.
+
+
+----------------
+Bogorman 10-Mar-11
+Added a param to the initializer so that you can specify the output directory. This is so we can render to tmp folder on heroku. 
+in confir.ru its now
+
+use Chuusha::Rack, File.dirname(__FILE__) + '/public', nil, File.dirname(__FILE__) + '/tmp'
