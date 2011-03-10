@@ -112,20 +112,8 @@ class ChuushaTest < Test::Unit::TestCase
       run Proc.new { |env| [200, {}, "hi"] }
     }
 
-    session = Rack::Test::Session.new(Rack::MockSession.new(app))
-
-    begin
-      ENV['RACK_ENV'] = 'production'
-
-      session.request '/' # gotta hit it once to init things
-      cached_files.each do |file|
-        assert File.exist?(file)
-      end
-    ensure
-      ENV['RACK_ENV'] = 'test'
-      cached_files.each do |file|
-        File.delete(file) if File.exist?(file)
-      end
+    with_request(app, cached_files) do |file|
+      assert File.exist?(file)
     end
   end
 
@@ -138,20 +126,9 @@ class ChuushaTest < Test::Unit::TestCase
                                        "variables" => { "black" => "#000" }}
       run Proc.new { |env| [200, {}, "hi"] }
     }
-    session = Rack::Test::Session.new(Rack::MockSession.new(app))
 
-    begin
-      ENV['RACK_ENV'] = 'production'
-
-      session.request '/' # gotta hit it one to init things
-      cached_files.each do |file|
-        assert !File.exist?(file)
-      end
-    ensure
-      ENV['RACK_ENV'] = 'test'
-      cached_files.each do |file|
-        File.delete(file) if File.exist?(file)
-      end
+    with_request(app, cached_files) do |file|
+      assert !File.exist?(file)
     end
   end
 
@@ -159,5 +136,23 @@ class ChuushaTest < Test::Unit::TestCase
     chuusha = Chuusha::Rack.new(nil, PUBLIC_DIR)
     resp = chuusha.call({"PATH_INFO" => '/no_config.css'})
     assert_equal "p { color: #00f; }\n", resp.last
+  end
+
+  def with_request(app, cached_files)
+    session = Rack::Test::Session.new(Rack::MockSession.new(app))
+
+    begin
+      ENV['RACK_ENV'] = 'production'
+
+      session.request '/' # gotta hit it once to init things
+      cached_files.each do |file|
+        yield file
+      end
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      cached_files.each do |file|
+        File.delete(file) if File.exist?(file)
+      end
+    end
   end
 end
