@@ -112,8 +112,15 @@ class ChuushaTest < Test::Unit::TestCase
       run Proc.new { |env| [200, {}, "hi"] }
     }
 
-    with_request(app, cached_files) do |file|
-      assert File.exist?(file)
+    begin
+      with_request(app, cached_files) do |file|
+        assert File.exist?(file)
+      end
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      cached_files.each do |file|
+        File.delete(file) if File.exist?(file)
+      end
     end
   end
 
@@ -127,8 +134,46 @@ class ChuushaTest < Test::Unit::TestCase
       run Proc.new { |env| [200, {}, "hi"] }
     }
 
-    with_request(app, cached_files) do |file|
-      assert !File.exist?(file)
+    begin
+      with_request(app, cached_files) do |file|
+        assert !File.exist?(file)
+      end
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      cached_files.each do |file|
+        File.delete(file) if File.exist?(file)
+      end
+    end
+  end
+
+  test "should cache files to alternate output dir when directed" do
+    cached_files = [ PUBLIC_DIR + "/application.css",
+                     PUBLIC_DIR + "/application.js" ]
+
+    output_dir = "/tmp"
+
+    # redefining app to overcome overriding of cached envs
+    app = Rack::Builder.new {
+      use Chuusha::Rack,
+          PUBLIC_DIR,
+          { "variables" => { "black" => "#000" }},
+          output_dir
+      run Proc.new { |env| [200, {}, "hi"] }
+    }
+
+    begin
+      with_request(app, cached_files) do |file|
+        path = "#{output_dir}/#{File.basename(file)}"
+        assert File.exist?(path), "Failed to cache file at #{path}"
+      end
+
+    ensure
+      ENV['RACK_ENV'] = 'test'
+      cached_files.each do |file|
+        File.delete(file) if File.exist?(file)
+        tmp_file = "#{output_dir}/#{File.basename(file)}"
+        File.delete(tmp_file) if File.exist?(tmp_file)
+      end
     end
   end
 
@@ -141,18 +186,11 @@ class ChuushaTest < Test::Unit::TestCase
   def with_request(app, cached_files)
     session = Rack::Test::Session.new(Rack::MockSession.new(app))
 
-    begin
-      ENV['RACK_ENV'] = 'production'
+    ENV['RACK_ENV'] = 'production'
 
-      session.request '/' # gotta hit it once to init things
-      cached_files.each do |file|
-        yield file
-      end
-    ensure
-      ENV['RACK_ENV'] = 'test'
-      cached_files.each do |file|
-        File.delete(file) if File.exist?(file)
-      end
+    session.request '/' # gotta hit it once to init things
+    cached_files.each do |file|
+      yield file
     end
   end
 end
