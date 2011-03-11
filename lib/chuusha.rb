@@ -8,7 +8,7 @@ module Chuusha
       @app      = app
       @root_dir = root_dir
       @config   = Config.new(config)
-      @output_dir = output_dir
+      @output_dir = output_dir || root_dir
       cache_everything if @config.cache_on_load?
     end
 
@@ -80,10 +80,7 @@ module Chuusha
   class Renderer
     def initialize(config, path, output_dir)
       @config = config
-      @outfile = path
-      if (output_dir != nil)
-        @outfile = File.join(output_dir,File.basename(path))
-      end
+      @outfile = File.join(output_dir, File.basename(path))
       @path = path + ".erb"
       @evaluated = nil
     end
