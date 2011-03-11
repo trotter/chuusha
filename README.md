@@ -72,4 +72,7 @@ Acknowledgements
 
 Thanks to [Mat Schaffer](http://matschaffer.com) for the name.
 
+Thanks to [Barry O'Gorman](https://github.com/bogorman) for fixing Heroku
+support.
+
 
