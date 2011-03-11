@@ -1,8 +1,8 @@
-Chuusha (pronounced chew-sha) is a Rack adapter that treats your css and javascript files as erb
-templates. It also provides a basic facility for sharing constants between all
-your templates and the rest of your Rack stack. It will continually evaluate
-templates in dev mode, while caching the rendered template in production. It
-plays nicely with Rails's asset caching.
+Chuusha (pronounced chew-sha) is a Rack adapter that treats your css and
+javascript files as erb templates. It also provides a basic facility for
+sharing constants between all your templates and the rest of your Rack stack.
+It will continually evaluate templates in dev mode, while caching the rendered
+template in production. It plays nicely with Rails's asset caching.
 
 Installation and Usage
 ----------------------
@@ -34,6 +34,31 @@ Now place a css erb template somewhere in '/public/stylesheets'
       border: 1px solid <%= highlight_color %>;
     }
 
+Common Variables
+----------------
+
+Occasionally, you'll want to share variables amongst many templates. To do so,
+pass a hash of variables to Chuusha like so:
+
+    use Chuusha::Rack,
+        File.dirname(__FILE__) + '/public',
+        { "variables" => { "highlight_color" => "#fc6666" }}
+
+This would add `highlight_color` as a variable in both your css and js erb
+templates.
+
+On Heroku
+---------
+
+Since Heroku won't allow you write to the file system, you'll have to tell
+Chuusha to write to /tmp. This is done by passing an output directory to
+Chuusha like so:
+
+    use Chuusha::Rack,
+        File.dirname(__FILE__) + '/public',
+        nil,
+        File.dirname(__FILE__) + '/tmp'
+
 Bugs
 ----
 
@@ -48,9 +73,3 @@ Acknowledgements
 Thanks to [Mat Schaffer](http://matschaffer.com) for the name.
 
 
-----------------
-Bogorman 10-Mar-11
-Added a param to the initializer so that you can specify the output directory. This is so we can render to tmp folder on heroku. 
-in confir.ru its now
-
-use Chuusha::Rack, File.dirname(__FILE__) + '/public', nil, File.dirname(__FILE__) + '/tmp'
