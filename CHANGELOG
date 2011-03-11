@@ -1,0 +1,6 @@
+Version: 0.2.0
+--------------
+
+- Added a param to the initializer so that you can specify the output directory.
+  This is so we can render to tmp folder on heroku. (contributed by Bogorman)
+
