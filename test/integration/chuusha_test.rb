@@ -150,7 +150,7 @@ class ChuushaTest < Test::Unit::TestCase
     cached_files = [ PUBLIC_DIR + "/application.css",
                      PUBLIC_DIR + "/application.js" ]
 
-    output_dir = "/tmp"
+    output_dir = "/tmp/chuusha"
 
     # redefining app to overcome overriding of cached envs
     app = Rack::Builder.new {
@@ -171,9 +171,8 @@ class ChuushaTest < Test::Unit::TestCase
       ENV['RACK_ENV'] = 'test'
       cached_files.each do |file|
         File.delete(file) if File.exist?(file)
-        tmp_file = "#{output_dir}/#{File.basename(file)}"
-        File.delete(tmp_file) if File.exist?(tmp_file)
       end
+      FileUtils.rm_rf(output_dir)
     end
   end
 

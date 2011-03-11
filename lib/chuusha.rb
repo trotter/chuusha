@@ -1,5 +1,6 @@
 require 'yaml'
 require 'erubis'
+require 'fileutils'
 
 module Chuusha
   class Rack
@@ -98,6 +99,7 @@ module Chuusha
     end
 
     def write_cached_copy
+      FileUtils.mkdir_p(File.dirname(@outfile))
       ::File.open(@outfile, "w") { |f| f.write evaluated }
     end
 
